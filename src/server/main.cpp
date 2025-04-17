@@ -24,15 +24,6 @@ class Server
 {
 public:
     std::vector<User*> users;
-
-    int serverSocket;
-    struct sockaddr_in serverAddr, clientAddr;
-    socklen_t addrLen = sizeof(clientAddr);
-    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = htons(PORT);
-
     Server();
     ~Server();
     void sendMessage(const std::string& message, int socket){
@@ -118,7 +109,6 @@ public:
     
     void handleClient(int socket, User user) {
         char buffer[1024];
-        int clientSocket;
 
 
         while (true) {
@@ -147,15 +137,19 @@ public:
     
     void initialize(){
 
-        
+        int serverSocket, clientSocket;
+        struct sockaddr_in serverAddr, clientAddr;
+        socklen_t addrLen = sizeof(clientAddr);
 
-        
+        serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0) {
             std::cerr << "Socket creation failed." << std::endl;
             return -1;
         }
 
-        
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_addr.s_addr = INADDR_ANY;
+        serverAddr.sin_port = htons(PORT);
 
         if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
             std::cerr << "Bind failed." << std::endl;
@@ -179,7 +173,9 @@ public:
 
 
 int main() {
-    
+    Server server;
+    server.initialize();
+    server.run();
 
     
     return 0;
