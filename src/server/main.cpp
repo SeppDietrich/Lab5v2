@@ -108,7 +108,8 @@ public:
             break;
             case 'm': // /message
                 if(controlClient(user)){
-                    broadcastMessage(data, user);
+                    std::string finalMessage =user->username+ " : "+ data;
+                    broadcastMessage(finalMessage, user);
                 }else{
                     returnMessage= "Client is neither authenticate or joined a room ";
                 }
