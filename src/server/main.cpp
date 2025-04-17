@@ -78,16 +78,18 @@ public:
             case 'a': // /auth
                 if(authenticationSuccess(data, user)) {
                     returnMessage= "Successfully logged in as " + data + "\n";
+                }else{
+                    returnMessage= "Authentication Failed";
                 }
-                returnMessage= "Authentication Failed";
             break;
             
                 
             case 'j': // /join
                 if(joinSuccess(data, user)){
                     returnMessage="Successfully joined room: " + data + "\n";
+                }else{
+                    returnMessage="Failed to join room : " + data;   
                 }
-                returnMessage="Failed to join room : " + data;
             break;
             // case 'm':{ // /message
                 
