@@ -4,40 +4,55 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
-#include <string>
+#include <thread>
 
 using namespace std;
-int main() {
-    int clientSocket;
-    struct sockaddr_in serverAddr;
-    char buffer[1024];
 
-    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket < 0) {
-        std::cerr << "Socket creation failed." << std::endl;
+void readThread(int sock) {
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        int bytes = read(sock, buffer, sizeof(buffer));
+        if (bytes <= 0) break;
+        cout<< buffer << endl;
+    }
+}
+
+int main() {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        cerr << "Socket error" << endl;
         return -1;
     }
 
+    sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(8080);
     serverAddr.sin_addr.s_addr = inet_addr("209.38.41.107");
-    
-    if (connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
-        std::cerr << "Connection failed." << std::endl;
+
+    if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        cerr << "Connect error" << endl;
         return -1;
     }
-    std::cout << "Succsesfuly connected \n";
+    string manual =
+                "/auth [username] - authenticate \n"
+                "/join [chatNumber] - join chat \n"
+                "/message [message] - message sent into chat \n"
+                "/leave - leave chat \n";
+    cout << "Connected!" << endl;
+    cout <<manual<<endl;
+
+    
+    thread reader(readThread, sock);
+    cout << "Enter command: ";
+    char msg[1024];
     while (true) {
         
-        std::cout << "Enter message: ";
-        std::cin.getline(buffer, sizeof(buffer));
-        send(clientSocket, buffer, strlen(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-        read(clientSocket, buffer, sizeof(buffer));
-        std::cout << buffer << std::endl;
-        
+        cin.getline(msg, sizeof(msg));
+        send(sock, msg, strlen(msg), 0);
     }
 
-    close(clientSocket);
+    reader.join();
+    close(sock);
     return 0;
 }

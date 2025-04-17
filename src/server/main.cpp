@@ -41,7 +41,7 @@ public:
     }
     void broadcastMessage(std::string message, User* user){
         for(int i =0;i<users.size();i++){
-            if(users[i]->roomID==user->roomID){
+            if(users[i]->roomID==user->roomID&& users[i]->socket!=user->socket){
                 sendMessage(message, users[i]->socket);
             }
         }
