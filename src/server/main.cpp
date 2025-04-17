@@ -13,8 +13,8 @@
 
 struct User {
     int socket;
-    std::string roomID;
-    std::string username;
+    std::string roomID ="";
+    std::string username= "";
 
     User(int socket) : socket(socket) {}
 };
@@ -40,7 +40,7 @@ public:
         }  
     }
     void broadcastMessage(std::string message, User* user){
-        for(int i =0;i<users.length();i++){
+        for(int i =0;i<users.size();i++){
             if(users[i]->roomID==user->roomID){
                 sendMessage(message, users[i]->socket);
             }
@@ -64,9 +64,9 @@ public:
         return true;
     }
     bool controlClient(User* user){
-        if(!user->username){
+        if(user->username!=""){
             return false;
-        }else if(!user->roomID){
+        }else if(user->roomID!=""){
             return false;
         }
         return true;
