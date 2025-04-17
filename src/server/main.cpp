@@ -134,7 +134,7 @@ public:
         
             //std::cout << fullMessage << "\n";
             
-            sendMessage(fullMessage, socket); 
+            sendMessage(message, socket); 
         }
         close(socket);
     }
@@ -146,7 +146,7 @@ public:
         serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0) {
             std::cerr << "Socket creation failed." << std::endl;
-            return -1;
+            return ;
         }
 
         serverAddr.sin_family = AF_INET;
@@ -155,12 +155,12 @@ public:
 
         if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
             std::cerr << "Bind failed." << std::endl;
-            return -1;
+            return ;
         }
 
         if (listen(serverSocket, MAX_CLIENTS) < 0) {
             std::cerr << "Listen failed." << std::endl;
-            return -1;
+            return ;
         }
 
         std::cout << "Server is listening on port " << PORT << std::endl;
