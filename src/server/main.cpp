@@ -12,14 +12,14 @@
 #define PORT 8080
 #define MAX_CLIENTS 10
 
-void sendMessage(const std::string& message){
+void sendMessage(const std::string& message, int socket){
         int bytesSent = send(socket, message.c_str(), message.size(), 0);  
         if (bytesSent < 0) {
             std::cerr << "Error sending message to client" << std::endl;
         }  
     }
 
-void handleClient() {
+void handleClient(int socket) {
         char buffer[1024];
 
         while (true) {
@@ -41,7 +41,7 @@ void handleClient() {
         
             //std::cout << fullMessage << "\n";
             
-            sendMessage(fullMessage); 
+            sendMessage(fullMessage, socket); 
         }
         close(socket);
     }
@@ -81,9 +81,8 @@ int main() {
         }
         std::cout << "New client connected: "<< std::endl;
 
-        User client(clientSocket);
 
-        std::thread(&User::handleClient, &client).detach();
+        std::thread(clientSocket).detach();
     }
 
     close(serverSocket);
