@@ -17,6 +17,11 @@ void readThread(int sock) {
         cout<< buffer << endl;
     }
 }
+void clearline(){
+    std::cout << "\033[1A";
+    std::cout << "\r";
+    std::cout << "\033[2K";
+}
 
 int main() {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -49,6 +54,7 @@ int main() {
     while (true) {
         
         cin.getline(msg, sizeof(msg));
+        clearline();
         send(sock, msg, strlen(msg), 0);
     }
 

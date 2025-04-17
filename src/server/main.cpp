@@ -34,7 +34,7 @@ public:
 };
 
 class Server {
-public:
+private:
     std::vector<User*> users;
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
@@ -63,6 +63,9 @@ public:
         logger.saveMessage(user->roomID, message);
 
     }
+    void deleteUser(User * user){
+        delete user;
+    }
 
     bool authenticationSuccess(std::string sentUsername, User* user) {  
         if (sentUsername.length() > 100) {
@@ -86,6 +89,17 @@ public:
         }else if(user->roomID==""){
             return false;
         }
+        return true;
+    }
+    bool leaveSuccess(User* user){
+        user->roomID="";
+        if (user->roomID==""){
+            return true
+        }
+        return false
+    }
+    bool exitSuccess(User* user){
+        user->deleteUser();
         return true;
     }
 
@@ -133,9 +147,21 @@ public:
                 }
                 
             break;
-            // case 'l':{ // /leave
-            //     return "Leaving current chat";
-            // }
+            case 'l': // /leave
+                if (leaveSuccess(user)){
+                    returnMessage= "Leaving current chat";    
+                }else{
+                    returnMessage="Unable to leave Chat";
+                }
+                
+            break;
+            case 'e':
+                if(exitSuccess(user)){
+                    returnMessage="Successfully quit the program";
+                }else{
+                    returnMessage="Unable to exit program";
+                }
+            break;
             default:
                 returnMessage="Unknown command: " + command;
             break;
@@ -159,10 +185,13 @@ public:
             
             parseMessage(message, response, user);
             sendMessage(response, user->socket); 
+            if(response=="Successfully quit the program"){
+                break;
+            }
         }
         close(user->socket);
     }
-
+public:
     void run() {
         while (true) {
             clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
