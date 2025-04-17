@@ -75,19 +75,20 @@ public:
         std::string data = (spacePos != std::string::npos) ? message.substr(spacePos + 1) : "";
 
         switch(command[1]) {
-            case 'a':{ // /auth
+            case 'a': // /auth
                 if(authenticationSuccess(data, user)) {
                     returnMessage= "Successfully logged in as " + data + "\n";
                 }
                 returnMessage= "Authentication Failed";
-            }
+            break;
+            
                 
-            case 'j':{ // /join
+            case 'j': // /join
                 if(joinSuccess(data, user)){
                     returnMessage="Successfully joined room: " + data + "\n";
                 }
                 returnMessage="Failed to join room : " + data;
-            }
+            break;
             // case 'm':{ // /message
                 
             //     return "Sending message: " + data;
@@ -95,9 +96,9 @@ public:
             // case 'l':{ // /leave
             //     return "Leaving current chat";
             // }
-            default:{
+            default:
                 returnMessage="Unknown command: " + command;
-            }
+            break;
         }
     }
 
