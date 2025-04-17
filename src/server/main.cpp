@@ -27,7 +27,7 @@ public:
     void saveMessage(std::string roomID, std::string message){
         std::string path="rooms/"+roomID+".txt";
         std::ofstream room;
-        room.open(path.c_str(), fstream::app)
+        room.open(path.c_str(), std::fstream::app)
         room<<message<<"\n";
         room.close();
     }
