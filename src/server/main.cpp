@@ -110,6 +110,7 @@ public:
                 if(controlClient(user)){
                     std::string finalMessage =user->username+ " : "+ data;
                     broadcastMessage(finalMessage, user);
+                    returnMessage=finalMessage;
                 }else{
                     returnMessage= "Client is neither authenticate or joined a room ";
                 }
