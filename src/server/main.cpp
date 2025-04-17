@@ -41,12 +41,7 @@ private:
     socklen_t addrLen = sizeof(clientAddr);
     Logger logger;
 
-    Server() {}
-    ~Server() {
-        for (auto user : users) {
-            delete user;
-        }
-    }
+    
 
     void sendMessage(const std::string& message, int socket) {
         int bytesSent = send(socket, message.c_str(), message.size(), 0);  
@@ -94,12 +89,12 @@ private:
     bool leaveSuccess(User* user){
         user->roomID="";
         if (user->roomID==""){
-            return true
+            return true;
         }
-        return false
+        return false;
     }
     bool exitSuccess(User* user){
-        user->deleteUser();
+        deleteUser(user);
         return true;
     }
 
@@ -192,6 +187,14 @@ private:
         close(user->socket);
     }
 public:
+
+    Server() {}
+    ~Server() {
+        for (auto user : users) {
+            delete user;
+        }
+    }
+
     void run() {
         while (true) {
             clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &addrLen);
