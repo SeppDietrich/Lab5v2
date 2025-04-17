@@ -74,7 +74,7 @@ public:
         std::string command = message.substr(0, spacePos);
         std::string data = (spacePos != std::string::npos) ? message.substr(spacePos + 1) : "";
 
-         switch(command[1]) {
+        switch(command[1]) {
             case 'a':{ // /auth
                 if(authenticationSuccess(data, user)) {
                     returnMessage= "Successfully logged in as " + data + "\n";
@@ -98,6 +98,7 @@ public:
             default:{
                 returnMessage="Unknown command: " + command;
             }
+        }
     }
 
     void handleClient(User* user) {
