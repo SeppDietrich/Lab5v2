@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <fstream>
 
 #define PORT 8080
 #define MAX_CLIENTS 10
@@ -18,6 +19,19 @@ struct User {
 
     User(int socket) : socket(socket) {}
 };
+class Logger{
+public:
+    Logger(){}
+    ~Logger(){}
+
+    void saveMessage(std::string roomID, std::string message){
+        std::string path="rooms/"+roomID+".txt"
+        ofstream room;
+        room.open(path.c_str(), fstream::app)
+        room<<message<<"\n";
+        room.close();
+    }
+}
 
 class Server {
 public:
@@ -25,6 +39,7 @@ public:
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t addrLen = sizeof(clientAddr);
+    Logger logger;
 
     Server() {}
     ~Server() {
@@ -45,6 +60,8 @@ public:
                 sendMessage(message, users[i]->socket);
             }
         }
+        logger.saveMessage(user->roomID, message);
+
     }
 
     bool authenticationSuccess(std::string sentUsername, User* user) {  
