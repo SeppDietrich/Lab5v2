@@ -111,7 +111,7 @@ public:
         close(serverSocket);
     }
     
-    void handleClient(int socket, User user) {
+    void static handleClient(int socket, User user) {
         char buffer[1024];
 
 
