@@ -17,13 +17,22 @@ struct User{
     std::string username;
     User(int socket): socket(socket){}
 
-}
+};
 
 
 class Server
 {
 public:
     std::vector<User*> users;
+
+    int serverSocket;
+    struct sockaddr_in serverAddr, clientAddr;
+    socklen_t addrLen = sizeof(clientAddr);
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(PORT);
+
     Server();
     ~Server();
     void sendMessage(const std::string& message, int socket){
@@ -38,12 +47,12 @@ public:
             return false;
         }
         user.username = sentUsername;  
-        std::cout<<"Client authenticated as : " <<Username<<std::endl;
+        std::cout<<"Client authenticated as : " <<user.username<<std::endl;
         return true;
     }
 
 
-    void parseMessage(std::string message, std::string &returnMessage){
+    void parseMessage(std::string message, std::string &returnMessage, User user){
         message.erase(message.find_last_not_of(" \t\n\r\f\v") + 1);
         if(message[0]!='/'){
             std::string manual=
@@ -61,7 +70,7 @@ public:
         
         switch(command[1]) {
             case 'a':{ // /auth
-                if(authenticationSuccess(data)) {
+                if(authenticationSuccess(data, user)) {
                     returnMessage= "Successfully logged in as " + data + "\n";
                 }
                 returnMessage= "Authentication Failed";
@@ -109,6 +118,7 @@ public:
     
     void handleClient(int socket, User user) {
         char buffer[1024];
+        int clientSocket;
 
 
         while (true) {
@@ -126,7 +136,7 @@ public:
             
             
             
-            std::string fullMessage = message;
+            parseMessage(message, message, user);
         
             //std::cout << fullMessage << "\n";
             
@@ -137,19 +147,15 @@ public:
     
     void initialize(){
 
-        int serverSocket, clientSocket;
-        struct sockaddr_in serverAddr, clientAddr;
-        socklen_t addrLen = sizeof(clientAddr);
+        
 
-        serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+        
         if (serverSocket < 0) {
             std::cerr << "Socket creation failed." << std::endl;
             return -1;
         }
 
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_addr.s_addr = INADDR_ANY;
-        serverAddr.sin_port = htons(PORT);
+        
 
         if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
             std::cerr << "Bind failed." << std::endl;
