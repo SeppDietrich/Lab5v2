@@ -24,6 +24,10 @@ class Server
 {
 public:
     std::vector<User*> users;
+
+    int serverSocket, clientSocket;
+    struct sockaddr_in serverAddr, clientAddr;
+    socklen_t addrLen = sizeof(clientAddr);
     Server();
     ~Server();
     void sendMessage(const std::string& message, int socket){
@@ -137,9 +141,7 @@ public:
     
     void initialize(){
 
-        int serverSocket, clientSocket;
-        struct sockaddr_in serverAddr, clientAddr;
-        socklen_t addrLen = sizeof(clientAddr);
+        
 
         serverSocket = socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0) {
