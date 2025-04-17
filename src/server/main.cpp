@@ -39,6 +39,13 @@ public:
             std::cerr << "Error sending message to client" << std::endl;
         }  
     }
+    void broadcastMessage(std::string message, User* user){
+        for(int i =0;i<users.length();i++){
+            if(users[i]->roomID==user->roomID){
+                sendMessage(message, users[i]->socket);
+            }
+        }
+    }
 
     bool authenticationSuccess(std::string sentUsername, User* user) {  
         if (sentUsername.length() > 100) {
@@ -54,6 +61,14 @@ public:
         }
         user->roomID=roomID;
         std::cout<<"Client "<< user->username<<" joined room: "<< user->roomID<<std::endl;
+        return true;
+    }
+    bool controlClient(User* user){
+        if(!user->username){
+            return false;
+        }else if(!user->roomID){
+            return false;
+        }
         return true;
     }
 
@@ -91,10 +106,14 @@ public:
                     returnMessage="Failed to join room : " + data;   
                 }
             break;
-            // case 'm':{ // /message
+            case 'm': // /message
+                if(controlClient(user)){
+                    broadcastMessage(data, user);
+                }else{
+                    returnMessage= "Client is neither authenticate or joined a room ";
+                }
                 
-            //     return "Sending message: " + data;
-            // }
+            break;
             // case 'l':{ // /leave
             //     return "Leaving current chat";
             // }
