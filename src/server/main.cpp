@@ -15,6 +15,7 @@
 struct User{
     int socket;
     std::string username;
+    User(int socket): socket(socket){}
 
 }
 
@@ -25,6 +26,67 @@ public:
     std::vector<User*> users;
     Server();
     ~Server();
+    void sendMessage(const std::string& message, int socket){
+        int bytesSent = send(socket, message.c_str(), message.size(), 0);  
+        if (bytesSent < 0) {
+            std::cerr << "Error sending message to client" << std::endl;
+        }  
+    }
+    bool authenticationSuccess(std::string sentUsername, User user) {  
+        
+        if(sentUsername.length()>100){
+            return false;
+        }
+        user.username = sentUsername;  
+        std::cout<<"Client authenticated as : " <<Username<<std::endl;
+        return true;
+    }
+
+
+    void parseMessage(std::string message, std::string &returnMessage){
+        message.erase(message.find_last_not_of(" \t\n\r\f\v") + 1);
+        if(message[0]!='/'){
+            std::string manual=
+                "/auth [username] - authenticate \n"
+                "/join [chatNumber] - join chat \n"
+                "/message [message] -message sent into chat \n"
+                "/leave -leave chat \n";
+            
+            returnMessage= manual;
+        }
+        int spacePos = message.find(' ');
+        std::string command = message.substr(0, spacePos);
+        std::string data = (spacePos != std::string::npos) ? message.substr(spacePos + 1) : "";
+
+        
+        switch(command[1]) {
+            case 'a':{ // /auth
+                if(authenticationSuccess(data)) {
+                    returnMessage= "Successfully logged in as " + data + "\n";
+                }
+                returnMessage= "Authentication Failed";
+            }
+                
+            // case 'j':{ // /join
+            //     int roomId=std::stoi(data);
+            //     roomHandler.joinRoom(this, data);
+
+            //     return "Joining chat: " + data;
+            // }
+            // case 'm':{ // /message
+                
+            //     return "Sending message: " + data;
+            // }
+            // case 'l':{ // /leave
+            //     return "Leaving current chat";
+            // }
+            default:{
+                returnMessage="Unknown command: " + command;
+            }
+        }
+
+        
+    }
 
     void run(){
         while (true) {
@@ -33,20 +95,21 @@ public:
                 std::cerr << "Accept failed." << std::endl;
                 continue;
             }
-
+            users.emplace_back(clientSocket);
             char clientIP[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
             std::cout << "New client connected from " << clientIP << ":" << ntohs(clientAddr.sin_port) << std::endl;
 
-            std::thread clientThread(handleClient, clientSocket);
+            std::thread clientThread(handleClient, clientSocket, users.end());
             clientThread.detach();
         }
 
         close(serverSocket);
     }
     
-    void handleClient(int socket) {
+    void handleClient(int socket, User user) {
         char buffer[1024];
+
 
         while (true) {
             memset(buffer, 0, sizeof(buffer));
@@ -105,12 +168,7 @@ public:
 };
 
 
-void sendMessage(const std::string& message, int socket){
-        int bytesSent = send(socket, message.c_str(), message.size(), 0);  
-        if (bytesSent < 0) {
-            std::cerr << "Error sending message to client" << std::endl;
-        }  
-    }
+
 
 
 
