@@ -79,10 +79,13 @@ int main() {
             std::cerr << "Accept failed." << std::endl;
             continue;
         }
-        std::cout << "New client connected: "<< std::endl;
 
+        char clientIP[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+        std::cout << "New client connected from " << clientIP << ":" << ntohs(clientAddr.sin_port) << std::endl;
 
-        std::thread(clientSocket).detach();
+        std::thread clientThread(handleClient, clientSocket);
+        clientThread.detach();
     }
 
     close(serverSocket);
