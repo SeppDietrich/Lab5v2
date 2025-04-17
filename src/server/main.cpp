@@ -13,7 +13,9 @@
 
 struct User {
     int socket;
+    std::string roomID;
     std::string username;
+
     User(int socket) : socket(socket) {}
 };
 
@@ -46,6 +48,14 @@ public:
         std::cout << "Client authenticated as: " << user->username << std::endl;
         return true;
     }
+    bool joinSuccess(std::string roomID, User* user){
+        if(roomID.length()>20){
+            return false;
+        }
+        user->roomID=roomID;
+        std::cout<<"Client "<< user->username<<" joined room: "<< user->roomID<<std::endl;
+        return true;
+    }
 
     void parseMessage(std::string message, std::string &returnMessage, User* user) {
         message.erase(message.find_last_not_of(" \t\n\r\f\v") + 1);
@@ -64,15 +74,30 @@ public:
         std::string command = message.substr(0, spacePos);
         std::string data = (spacePos != std::string::npos) ? message.substr(spacePos + 1) : "";
 
-        if (command == "/auth") {
-            if (authenticationSuccess(data, user)) {
-                returnMessage = "Successfully logged in as " + data + "\n";
-            } else {
-                returnMessage = "Authentication Failed";
+         switch(command[1]) {
+            case 'a':{ // /auth
+                if(authenticationSuccess(data, user)) {
+                    returnMessage= "Successfully logged in as " + data + "\n";
+                }
+                returnMessage= "Authentication Failed";
             }
-        } else {
-            returnMessage = "Unknown command: " + command;
-        }
+                
+            case 'j':{ // /join
+                if(joinSuccess(data, user)){
+                    returnMessage="Successfully joined room: " + data + "\n";
+                }
+                returnMessage="Failed to join room : " + data;
+            }
+            // case 'm':{ // /message
+                
+            //     return "Sending message: " + data;
+            // }
+            // case 'l':{ // /leave
+            //     return "Leaving current chat";
+            // }
+            default:{
+                returnMessage="Unknown command: " + command;
+            }
     }
 
     void handleClient(User* user) {
