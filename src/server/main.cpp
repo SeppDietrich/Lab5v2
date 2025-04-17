@@ -64,9 +64,9 @@ public:
         return true;
     }
     bool controlClient(User* user){
-        if(user->username!=""){
+        if(user->username==""){
             return false;
-        }else if(user->roomID!=""){
+        }else if(user->roomID==""){
             return false;
         }
         return true;
