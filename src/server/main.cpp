@@ -10,7 +10,8 @@
 #include <fstream>
 
 #define PORT 8080
-#define MAX_CLIENTS 10
+#define MAX_CLIENTS 256
+
 
 struct User {
     int socket;
@@ -105,7 +106,8 @@ private:
                 "/auth [username] - authenticate \n"
                 "/join [chatNumber] - join chat \n"
                 "/message [message] - message sent into chat \n"
-                "/leave - leave chat \n";
+                "/leave - leave chat \n"
+                "/exit - exit program\n";
             
             returnMessage = manual;
             return;
